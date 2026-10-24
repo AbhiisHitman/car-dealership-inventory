@@ -1,3 +1,4 @@
+import { mkdirSync } from 'node:fs';
 import type { PGlite } from '@electric-sql/pglite';
 
 /**
@@ -19,6 +20,7 @@ export interface Database {
  */
 export async function createPgliteDatabase(dataDir?: string): Promise<Database> {
   const { PGlite } = await import('@electric-sql/pglite');
+  if (dataDir) mkdirSync(dataDir, { recursive: true });
   const client: PGlite = dataDir ? new PGlite(dataDir) : new PGlite();
   await client.waitReady;
   return {
