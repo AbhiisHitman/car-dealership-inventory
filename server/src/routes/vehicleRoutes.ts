@@ -1,5 +1,5 @@
 import { Router, type Request, type RequestHandler } from 'express';
-import { NotFoundError } from '../errors.js';
+import { VehicleNotFoundError } from '../errors.js';
 import { requireRole } from '../middleware/authenticate.js';
 import type { VehicleService } from '../services/vehicleService.js';
 import {
@@ -13,7 +13,7 @@ import { validate } from '../validation/validate.js';
 /** A malformed id can never match a row, so it is reported as "not found" rather than a 400. */
 export function vehicleId(req: Request): string {
   const parsed = idParamSchema.safeParse(req.params);
-  if (!parsed.success) throw new NotFoundError('Vehicle not found');
+  if (!parsed.success) throw new VehicleNotFoundError();
   return parsed.data.id;
 }
 

@@ -42,3 +42,9 @@ export class ConflictError extends AppError {
     super(message, 409);
   }
 }
+
+export class VehicleNotFoundError extends NotFoundError {
+  constructor() {
+    super('Vehicle not found');
+  }
+}
