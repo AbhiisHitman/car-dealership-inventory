@@ -2,7 +2,7 @@ import type { Database } from '../db/database.js';
 import type { Vehicle, VehicleSearchFilters } from '../domain/vehicle.js';
 import type { CreateVehicleInput, UpdateVehicleInput } from '../validation/schemas.js';
 
-interface VehicleRow {
+export interface VehicleRow {
   id: string;
   make: string;
   model: string;

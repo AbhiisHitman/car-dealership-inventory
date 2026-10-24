@@ -79,3 +79,12 @@ export const idParamSchema = z.object({ id: z.uuid() });
 
 export type CreateVehicleInput = z.infer<typeof createVehicleSchema>;
 export type UpdateVehicleInput = z.infer<typeof updateVehicleSchema>;
+
+const stockQuantity = z
+  .number('Quantity must be a number')
+  .int('Quantity must be a whole number')
+  .positive('Quantity must be at least 1')
+  .max(1000);
+
+export const purchaseSchema = z.object({ quantity: stockQuantity.default(1) });
+export const restockSchema = z.object({ quantity: stockQuantity });
