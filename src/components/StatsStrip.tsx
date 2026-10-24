@@ -5,10 +5,10 @@ import type { InventoryStats } from '../lib/types';
 
 function Stat({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
   return (
-    <div className="panel flex items-center gap-3 px-4 py-3.5">
-      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent/12 text-accent">{icon}</span>
+    <div className="panel flex items-center gap-3 px-3 py-3 sm:px-4 sm:py-3.5">
+      <span className="hidden size-10 shrink-0 place-items-center rounded-xl bg-accent/12 text-accent min-[400px]:grid">{icon}</span>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium tracking-wide text-muted uppercase">{label}</p>
+        <p className="text-[11px] leading-tight font-medium tracking-wide text-muted uppercase sm:text-xs">{label}</p>
         <p className="font-display text-xl font-semibold tabular-nums">{value}</p>
       </div>
     </div>
