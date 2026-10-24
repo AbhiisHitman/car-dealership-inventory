@@ -17,6 +17,7 @@ A full-stack dealership inventory app. Customers register, browse the showroom, 
 - [Design decisions](#design-decisions)
 - [Deployment](#deployment)
 - [Screenshots](#screenshots)
+- [My AI Usage](#my-ai-usage)
 
 ## Features
 
@@ -220,6 +221,23 @@ The schema and demo data are created on the first request.
 | ![Admin edit](docs/screenshots/07-admin-edit.png) Admin editing a vehicle | ![Garage](docs/screenshots/08-garage.png) Purchase history |
 
 <p align="center"><img src="docs/screenshots/09-mobile-showroom.png" alt="Showroom on a phone" width="300" /></p>
+
+## My AI Usage
+
+**Tools.** I used an AI coding assistant (chat plus an agent that can edit files and run commands in my terminal) throughout the project.
+
+**How I used it.**
+- **Planning:** turning the kata brief into an architecture: the route, service and repository layers, the PGlite-locally / Neon-in-production database setup, and the Vercel layout.
+- **Tests first:** drafting the failing specs for each backend feature (auth, vehicle CRUD, search, inventory, bootstrap), including edge cases such as LIKE-wildcard escaping and the concurrent-purchase test, before writing the implementation.
+- **Implementation:** generating boilerplate for the Express middleware, repositories, zod schemas and React components, then integrating the React Bits components I chose (PatternWaves, CrystalizedBall, FlyingButton).
+- **Debugging and review:** running the suite, smoke-testing the API and UI in a browser, and fixing what it found, such as the missing PGlite data directory on a fresh clone, blank prices being saved as $0, and truncated stat labels on phones.
+- **Docs and deployment:** drafting this README and the test report, and setting up Vercel with a Neon database.
+
+I made the product and design decisions myself: admin-only vehicle editing, the atomic purchase rule, the visual direction and which components to use. I reviewed the generated code and checked every change against the tests and in the running app.
+
+**Reflection.** The assistant made the red-green-refactor loop fast: writing a thorough failing spec was cheap, so I wrote more of them and caught edge cases (overselling, leaked error messages, account enumeration) I might otherwise have skipped. It was weakest when it couldn't observe results directly, such as WebGL rendering or GitHub's display, so I still had to run the app, look at it and correct course. Overall it shifted my time from typing boilerplate to specifying behaviour and reviewing it.
+
+The raw chat logs are in [PROMPTS.md](PROMPTS.md).
 
 ## Credits
 
