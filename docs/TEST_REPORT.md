@@ -6,18 +6,18 @@ Generated with `npm run test:coverage` (Vitest 5.0.5, Node v26.5.0).
 
 | Suite | Files | Tests | Result |
 |---|---|---|---|
-| API (Node, real Postgres via PGlite) | 8 | 88 | all passing |
-| Web (jsdom + Testing Library) | 11 | 56 | all passing |
-| **Total** | **19** | **144** | **144 passed, 0 failed** |
+| API (Node, real Postgres via PGlite) | 9 | 97 | all passing |
+| Web (jsdom + Testing Library) | 12 | 60 | all passing |
+| **Total** | **21** | **157** | **157 passed, 0 failed** |
 
 ## Coverage
 
 | Metric | Coverage |
 |---|---|
-| Statements | 93.1% |
-| Branches | 90.5% |
-| Functions | 90.5% |
-| Lines | 94.9% |
+| Statements | 93.3% |
+| Branches | 90.8% |
+| Functions | 90.7% |
+| Lines | 95.1% |
 
 The React Bits WebGL components, the process entry points and seed scripts are excluded: they need a GPU or a running server and are exercised manually and in the deployed app.
 
@@ -27,16 +27,18 @@ The React Bits WebGL components, the process entry points and seed scripts are e
 |---|---|---|
 | `server/tests/auth.test.ts` | 15 | 15 |
 | `server/tests/bootstrap.test.ts` | 3 | 3 |
+| `server/tests/catalog.test.ts` | 3 | 3 |
 | `server/tests/errors.test.ts` | 4 | 4 |
 | `server/tests/inventory.test.ts` | 19 | 19 |
 | `server/tests/search.test.ts` | 10 | 10 |
 | `server/tests/tokenService.test.ts` | 3 | 3 |
 | `server/tests/unit.test.ts` | 10 | 10 |
-| `server/tests/vehicles.test.ts` | 24 | 24 |
+| `server/tests/vehicles.test.ts` | 30 | 30 |
 | `src/App.test.tsx` | 7 | 7 |
 | `src/components/FilterBar.test.tsx` | 5 | 5 |
 | `src/components/VehicleCard.test.tsx` | 5 | 5 |
 | `src/components/VehicleFormDialog.test.tsx` | 2 | 2 |
+| `src/components/VehiclePhoto.test.tsx` | 4 | 4 |
 | `src/hooks/useInventory.test.ts` | 7 | 7 |
 | `src/lib/api.test.ts` | 6 | 6 |
 | `src/lib/format.test.ts` | 5 | 5 |
@@ -70,6 +72,12 @@ The React Bits WebGL components, the process entry points and seed scripts are e
 - PASS bootstrap migrates, seeds demo vehicles and creates the admin account
 - PASS bootstrap is idempotent and does not re-seed after the catalogue is emptied
 - PASS bootstrap skips demo data when seeding is disabled
+
+### server/tests/catalog.test.ts
+
+- PASS refreshDemoCatalog replaces legacy demo cars with the current catalogue and keeps admin-added cars
+- PASS refreshDemoCatalog updates catalogue cars that already exist instead of duplicating them, keeping their stock
+- PASS refreshDemoCatalog keeps purchase history when a legacy car is removed
 
 ### server/tests/errors.test.ts
 
@@ -146,12 +154,18 @@ The React Bits WebGL components, the process entry points and seed scripts are e
 - PASS Vehicles API POST /api/vehicles returns 400 for a fractional quantity
 - PASS Vehicles API POST /api/vehicles returns 400 for a negative quantity
 - PASS Vehicles API POST /api/vehicles returns 400 for an empty category
+- PASS Vehicles API POST /api/vehicles stores an optional photo with its credit
+- PASS Vehicles API POST /api/vehicles leaves the photo fields null when no photo is given
+- PASS Vehicles API POST /api/vehicles rejects the photo URL javascript:alert(1)
+- PASS Vehicles API POST /api/vehicles rejects the photo URL ftp://example.com/car.jpg
+- PASS Vehicles API POST /api/vehicles rejects the photo URL not a url
 - PASS Vehicles API POST /api/vehicles defaults quantity to zero when omitted
 - PASS Vehicles API GET /api/vehicles lists every vehicle for any signed-in user
 - PASS Vehicles API GET /api/vehicles returns an empty list when the lot is empty
 - PASS Vehicles API GET /api/vehicles/:id returns a single vehicle
 - PASS Vehicles API GET /api/vehicles/:id returns 404 for malformed or unknown ids
 - PASS Vehicles API PUT /api/vehicles/:id updates only the supplied fields
+- PASS Vehicles API PUT /api/vehicles/:id can remove a photo by setting it to null
 - PASS Vehicles API PUT /api/vehicles/:id returns 400 for an empty update
 - PASS Vehicles API PUT /api/vehicles/:id returns 404 for an unknown vehicle
 - PASS Vehicles API PUT /api/vehicles/:id forbids regular users from editing vehicles
@@ -189,6 +203,13 @@ The React Bits WebGL components, the process entry points and seed scripts are e
 
 - PASS toPayload trims text and converts numbers
 - PASS toPayload sends a blank price as null so the API rejects it instead of saving $0
+
+### src/components/VehiclePhoto.test.tsx
+
+- PASS VehiclePhoto shows the photo with descriptive alt text and a linked credit
+- PASS VehiclePhoto falls back to the illustration when the photo fails to load
+- PASS VehiclePhoto uses the illustration when there is no photo
+- PASS VehiclePhoto can hide the credit on small thumbnails
 
 ### src/hooks/useInventory.test.ts
 

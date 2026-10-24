@@ -34,6 +34,14 @@ A full-stack dealership inventory app. Customers register, browse the showroom, 
 - Add, edit, restock and delete vehicles from the same showroom, with server-side validation errors shown in the forms.
 - Stock value tile on the dashboard.
 
+**Real cars**: the showroom has 26 current 2026 US-market models, from a $23,125 Toyota Corolla LE to a $149,400 Porsche 911 Carrera Cabriolet. Each one has:
+- its published starting MSRP
+- a factory paint name
+- accurate engine and power figures
+- a real, openly licensed photo credited to its photographer
+
+See [Vehicle data](#vehicle-data).
+
 **Visuals**: three open-source [React Bits](https://reactbits.dev) components:
 - `PatternWaves`: the interactive dot-wave backdrop on every page.
 - `CrystalizedBall`: the hero on the landing page and the sign-in / sign-up pages.
@@ -82,7 +90,7 @@ Requests flow `route -> service -> repository -> Database`. Each layer depends o
 | Table | Columns |
 |---|---|
 | `users` | `id` (uuid), `name`, `email` (unique, lower-cased), `password_hash`, `role` (`user` / `admin`), `created_at` |
-| `vehicles` | `id` (uuid), `make`, `model`, `category`, `price` (numeric, >= 0), `quantity` (int, >= 0), `year`, `color`, `description`, timestamps |
+| `vehicles` | `id` (uuid), `make`, `model`, `category`, `price` (numeric, >= 0), `quantity` (int, >= 0), `year`, `color`, `description`, `image_url`, `image_credit`, `image_source_url`, timestamps |
 | `purchases` | `id`, `user_id`, `vehicle_id` (set null if the vehicle is deleted), `vehicle_label`, `quantity`, `unit_price`, `created_at` |
 | `app_meta` | key/value flags (records that the demo catalogue was seeded) |
 
@@ -99,7 +107,7 @@ All responses are JSON. Errors always look like `{ "error": { "message": "...", 
 | GET | `/api/vehicles/search` | signed in | Query: `make`, `model`, `category`, `minPrice`, `maxPrice` (all optional, combined with AND) |
 | GET | `/api/vehicles/stats` | signed in | Dashboard totals and category list |
 | GET | `/api/vehicles/:id` | signed in | One vehicle |
-| POST | `/api/vehicles` | admin | Add a vehicle `{ make, model, category, price, quantity?, year?, color?, description? }` |
+| POST | `/api/vehicles` | admin | Add a vehicle `{ make, model, category, price, quantity?, year?, color?, description?, imageUrl?, imageCredit?, imageSourceUrl? }` |
 | PUT | `/api/vehicles/:id` | admin | Update any subset of the fields above |
 | DELETE | `/api/vehicles/:id` | admin | Delete a vehicle (204) |
 | POST | `/api/vehicles/:id/purchase` | signed in | `{ quantity? = 1 }`; decreases stock, returns `{ vehicle, purchase }`; 409 if not enough stock |
@@ -123,7 +131,7 @@ npm run dev
 
 `npm run dev` starts both halves:
 
-- **Backend**: the API on http://localhost:4000 (`npm run dev:api`, `tsx watch`). With `DATABASE_URL` empty it uses the embedded PGlite Postgres stored in `.data/pglite`. On first start it creates the schema, seeds 16 demo vehicles and creates the admin account from `.env`.
+- **Backend**: the API on http://localhost:4000 (`npm run dev:api`, `tsx watch`). With `DATABASE_URL` empty it uses the embedded PGlite Postgres stored in `.data/pglite`. On first start it creates the schema, seeds the 26-car catalogue and creates the admin account from `.env`.
 - **Frontend**: the Vite dev server on http://localhost:5173 (`npm run dev:web`), which proxies `/api` to the backend.
 
 Open http://localhost:5173 and either create an account or sign in with the demo admin from `.env.example`:
@@ -145,6 +153,7 @@ To use your own Postgres instead, set `DATABASE_URL` in `.env` (for example `pos
 | `npm run typecheck` | TypeScript across server, API function and SPA |
 | `npm run build` | Typecheck and build the SPA into `dist/` |
 | `npm run seed` | Apply the schema, demo data and admin account, then exit |
+| `npm run catalog:refresh` | Replace the old demo cars with the current catalogue in an existing database |
 
 ### Environment variables
 
@@ -161,7 +170,7 @@ To use your own Postgres instead, set `DATABASE_URL` in `.env` (for example `pos
 ## Testing
 
 ```bash
-npm test               # 144 tests
+npm test               # all tests
 npm run test:coverage  # with coverage
 ```
 
@@ -169,9 +178,9 @@ The full results, per-file counts and every test case are in **[docs/TEST_REPORT
 
 | Suite | Tests | Notes |
 |---|---|---|
-| API | 88 | Supertest against the real Express app and a fresh in-memory Postgres (PGlite) per file |
-| Web | 56 | Testing Library in jsdom; pages are rendered inside the real providers with the API client mocked |
-| Coverage | 93.1% statements, 90.5% branches, 94.9% lines | |
+| API | 97 | Supertest against the real Express app and a fresh in-memory Postgres (PGlite) per file |
+| Web | 60 | Testing Library in jsdom; pages are rendered inside the real providers with the API client mocked |
+| Coverage | 93.3% statements, 90.8% branches, 95.1% lines | |
 
 What the API tests pin down includes:
 - validation and duplicate emails
@@ -212,12 +221,25 @@ To deploy your own copy:
 
 The schema and demo data are created on the first request.
 
+## Vehicle data
+
+The catalogue lives in [`server/src/seed/demoVehicles.ts`](server/src/seed/demoVehicles.ts).
+
+- **Models and trims** are real 2026 US-market vehicles.
+- **Prices** are each trim's published starting MSRP in USD, taken from manufacturer configurators and pricing guides (Edmunds, Kelley Blue Book, Cars.com, TrueCar) in October 2026. Some sources include the destination charge, so treat prices as approximate and check a dealer for a firm quote.
+- **Specs** in the descriptions (engine, horsepower) are the manufacturers' published figures.
+- **Colours** are factory paint names matching the car in each photo.
+- **Photos** come from [Wikimedia Commons](https://commons.wikimedia.org) under CC BY, CC BY-SA or CC0 licences, as attribution requires. Each card credits the photographer and licence and links to the original file. If a photo can't load, the card falls back to an illustrated silhouette.
+- **Stock levels** are invented for the demo.
+
+Admins can add their own vehicles with any photo URL, credit and source link.
+
 ## Screenshots
 
 | | |
 |---|---|
 | ![Landing page](docs/screenshots/01-landing.png) Landing page: PatternWaves backdrop, CrystalizedBall hero and the FlyingButton call to action | ![Sign up](docs/screenshots/03-register.png) Sign up |
-| ![Search and filters](docs/screenshots/05-search-filters.png) SUVs under $70,000 | ![Checkout](docs/screenshots/06-purchase-liftoff.png) Checkout: the order is placed and the button takes off |
+| ![Search and filters](docs/screenshots/05-search-filters.png) Electric cars under $45,000 | ![Checkout](docs/screenshots/06-purchase-liftoff.png) Checkout: the order is placed and the button takes off |
 | ![Admin edit](docs/screenshots/07-admin-edit.png) Admin editing a vehicle | ![Garage](docs/screenshots/08-garage.png) Purchase history |
 
 <p align="center"><img src="docs/screenshots/09-mobile-showroom.png" alt="Showroom on a phone" width="300" /></p>
@@ -241,4 +263,4 @@ The raw chat logs are in [PROMPTS.md](PROMPTS.md).
 
 ## Credits
 
-The `FlyingButton`, `CrystalizedBall` and `PatternWaves` components come from [React Bits](https://reactbits.dev), used as published (JavaScript + CSS variants). Vehicle names and specs in the demo catalogue are illustrative.
+The `FlyingButton`, `CrystalizedBall` and `PatternWaves` components come from [React Bits](https://reactbits.dev), used as published (JavaScript + CSS variants). Vehicle photos are by Wikimedia Commons contributors, credited individually in the app and in [`demoVehicles.ts`](server/src/seed/demoVehicles.ts).

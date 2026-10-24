@@ -12,10 +12,11 @@ interface VehicleCardProps {
   onDelete(vehicle: Vehicle): void;
 }
 
+/** Text colours only: the badge sits on a solid dark chip so it stays readable over any photo. */
 const STOCK_STYLES = {
-  in: 'bg-success/12 text-success',
-  low: 'bg-warning/12 text-warning',
-  out: 'bg-danger/12 text-danger'
+  in: 'text-success',
+  low: 'text-warning',
+  out: 'text-danger'
 } as const;
 
 export function VehicleCard({ vehicle, isAdmin, onPurchase, onEdit, onRestock, onDelete }: VehicleCardProps) {
@@ -29,7 +30,7 @@ export function VehicleCard({ vehicle, isAdmin, onPurchase, onEdit, onRestock, o
         <VehiclePhoto vehicle={vehicle} className={`h-44 w-full ${soldOut ? 'opacity-55 grayscale' : ''}`} />
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3">
           <span className="rounded-full border border-white/10 bg-ink/75 px-2.5 py-1 text-xs font-medium text-fg backdrop-blur-sm">{vehicle.category}</span>
-          <span className={`rounded-full bg-ink/80 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${STOCK_STYLES[level]}`}>
+          <span className={`rounded-full border border-white/10 bg-ink/85 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${STOCK_STYLES[level]}`}>
             {stockLabel(vehicle.quantity)}
           </span>
         </div>
