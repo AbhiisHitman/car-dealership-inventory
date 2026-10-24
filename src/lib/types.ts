@@ -18,12 +18,15 @@ export interface Vehicle {
   year: number | null;
   color: string | null;
   description: string | null;
+  imageUrl: string | null;
+  imageCredit: string | null;
+  imageSourceUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export type VehicleInput = Pick<Vehicle, 'make' | 'model' | 'category' | 'price' | 'quantity'> &
-  Partial<Pick<Vehicle, 'year' | 'color' | 'description'>>;
+  Partial<Pick<Vehicle, 'year' | 'color' | 'description' | 'imageUrl' | 'imageCredit' | 'imageSourceUrl'>>;
 
 export interface Purchase {
   id: string;

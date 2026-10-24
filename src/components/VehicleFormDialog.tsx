@@ -13,9 +13,24 @@ interface VehicleFormDialogProps {
   onSaved(vehicle: Vehicle, created: boolean): void;
 }
 
-type FormState = Record<'make' | 'model' | 'category' | 'price' | 'quantity' | 'year' | 'color' | 'description', string>;
+type FormState = Record<
+  'make' | 'model' | 'category' | 'price' | 'quantity' | 'year' | 'color' | 'description' | 'imageUrl' | 'imageCredit' | 'imageSourceUrl',
+  string
+>;
 
-const EMPTY: FormState = { make: '', model: '', category: '', price: '', quantity: '1', year: '', color: '', description: '' };
+const EMPTY: FormState = {
+  make: '',
+  model: '',
+  category: '',
+  price: '',
+  quantity: '1',
+  year: '',
+  color: '',
+  description: '',
+  imageUrl: '',
+  imageCredit: '',
+  imageSourceUrl: ''
+};
 
 const toForm = (v: Vehicle): FormState => ({
   make: v.make,
@@ -25,7 +40,10 @@ const toForm = (v: Vehicle): FormState => ({
   quantity: String(v.quantity),
   year: v.year ? String(v.year) : '',
   color: v.color ?? '',
-  description: v.description ?? ''
+  description: v.description ?? '',
+  imageUrl: v.imageUrl ?? '',
+  imageCredit: v.imageCredit ?? '',
+  imageSourceUrl: v.imageSourceUrl ?? ''
 });
 
 /** Blank numeric inputs become NaN, which JSON sends as null so the API reports them as missing. */
@@ -41,7 +59,10 @@ export function toPayload(form: FormState): VehicleInput {
     quantity: toNumber(form.quantity),
     year: form.year ? Number(form.year) : null,
     color: form.color.trim() || null,
-    description: form.description.trim() || null
+    description: form.description.trim() || null,
+    imageUrl: form.imageUrl.trim() || null,
+    imageCredit: form.imageCredit.trim() || null,
+    imageSourceUrl: form.imageSourceUrl.trim() || null
   };
 }
 
@@ -119,6 +140,18 @@ export function VehicleFormDialog({ open, vehicle, categories, onClose, onSaved 
           <div className="sm:col-span-2">
             <label htmlFor="vehicle-color" className="label">Colour</label>
             <input className="field" maxLength={40} placeholder="Midnight Blue" {...field('color')} />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="vehicle-imageUrl" className="label">Photo URL</label>
+            <input className="field" type="url" inputMode="url" placeholder="https://upload.wikimedia.org/..." {...field('imageUrl')} />
+          </div>
+          <div>
+            <label htmlFor="vehicle-imageCredit" className="label">Photo credit</label>
+            <input className="field" maxLength={200} placeholder="Author, licence" {...field('imageCredit')} />
+          </div>
+          <div>
+            <label htmlFor="vehicle-imageSourceUrl" className="label">Photo source page</label>
+            <input className="field" type="url" inputMode="url" placeholder="https://commons.wikimedia.org/wiki/File:..." {...field('imageSourceUrl')} />
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="vehicle-description" className="label">Description</label>

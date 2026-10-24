@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../lib/api';
 import { formatPrice } from '../lib/format';
 import type { Purchase, Vehicle } from '../lib/types';
-import { CarArt } from './CarArt';
+import { VehiclePhoto } from './VehiclePhoto';
 import { FormError } from './FormError';
 import { Modal } from './Modal';
 import FlyingButton from './reactbits/FlyingButton';
@@ -51,7 +51,7 @@ export function PurchaseDialog({ vehicle, onClose, onPurchased }: PurchaseDialog
   return (
     <Modal open onClose={onClose} title={done ? 'It is yours.' : 'Confirm purchase'} description={title}>
       <div className="flex items-center gap-4 rounded-xl border border-line bg-surface-2 p-3">
-        <CarArt category={vehicle.category} color={vehicle.color} seed={vehicle.id} className="h-16 w-32 shrink-0" />
+        <VehiclePhoto vehicle={vehicle} showCredit={false} className="h-16 w-28 shrink-0 rounded-lg" />
         <div className="min-w-0">
           <p className="truncate font-semibold">{title}</p>
           <p className="text-sm text-muted">

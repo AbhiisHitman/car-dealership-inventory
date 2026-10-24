@@ -1,7 +1,7 @@
 import { PackagePlus, Pencil, ShoppingCart, Trash2 } from 'lucide-react';
 import { formatPrice, stockLabel, stockLevel } from '../lib/format';
 import type { Vehicle } from '../lib/types';
-import { CarArt } from './CarArt';
+import { VehiclePhoto } from './VehiclePhoto';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -25,17 +25,14 @@ export function VehicleCard({ vehicle, isAdmin, onPurchase, onEdit, onRestock, o
 
   return (
     <article className="group panel flex flex-col overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:border-faint" aria-label={title}>
-      <div className="relative bg-gradient-to-b from-surface-3/80 to-surface-2/40 px-4 pt-4">
-        <div className="flex items-center justify-between">
-          <span className="rounded-full border border-line bg-ink/60 px-2.5 py-1 text-xs font-medium text-muted">{vehicle.category}</span>
-          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STOCK_STYLES[level]}`}>{stockLabel(vehicle.quantity)}</span>
+      <div className="relative">
+        <VehiclePhoto vehicle={vehicle} className={`h-44 w-full ${soldOut ? 'opacity-55 grayscale' : ''}`} />
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3">
+          <span className="rounded-full border border-white/10 bg-ink/75 px-2.5 py-1 text-xs font-medium text-fg backdrop-blur-sm">{vehicle.category}</span>
+          <span className={`rounded-full bg-ink/80 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${STOCK_STYLES[level]}`}>
+            {stockLabel(vehicle.quantity)}
+          </span>
         </div>
-        <CarArt
-          category={vehicle.category}
-          color={vehicle.color}
-          seed={vehicle.id}
-          className={`mx-auto -mb-1 h-28 w-full transition duration-300 group-hover:scale-[1.03] ${soldOut ? 'opacity-50 grayscale' : ''}`}
-        />
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">

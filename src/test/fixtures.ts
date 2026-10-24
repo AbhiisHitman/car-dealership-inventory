@@ -10,6 +10,9 @@ export const makeVehicle = (overrides: Partial<Vehicle> = {}): Vehicle => ({
   year: 2024,
   color: 'Celestite Grey',
   description: 'Reliable daily driver.',
+  imageUrl: null,
+  imageCredit: null,
+  imageSourceUrl: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   ...overrides
