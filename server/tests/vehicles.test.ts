@@ -69,6 +69,30 @@ describe('Vehicles API', () => {
       expect(res.status).toBe(400);
     });
 
+    it('stores an optional photo with its credit', async () => {
+      const photo = {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Car.jpg/800px-Car.jpg',
+        imageCredit: 'Jane Doe, CC BY-SA 4.0',
+        imageSourceUrl: 'https://commons.wikimedia.org/wiki/File:Car.jpg'
+      };
+      const res = await request(ctx.app).post('/api/vehicles').set(admin).send({ ...sampleVehicle, ...photo });
+
+      expect(res.status).toBe(201);
+      expect(res.body.vehicle).toMatchObject(photo);
+    });
+
+    it('leaves the photo fields null when no photo is given', async () => {
+      const res = await request(ctx.app).post('/api/vehicles').set(admin).send(sampleVehicle);
+
+      expect(res.body.vehicle).toMatchObject({ imageUrl: null, imageCredit: null, imageSourceUrl: null });
+    });
+
+    it.each(['javascript:alert(1)', 'ftp://example.com/car.jpg', 'not a url'])('rejects the photo URL %s', async imageUrl => {
+      const res = await request(ctx.app).post('/api/vehicles').set(admin).send({ ...sampleVehicle, imageUrl });
+
+      expect(res.status).toBe(400);
+    });
+
     it('defaults quantity to zero when omitted', async () => {
       const { quantity: _omit, ...withoutQuantity } = sampleVehicle;
       const res = await request(ctx.app).post('/api/vehicles').set(admin).send(withoutQuantity);
@@ -125,6 +149,14 @@ describe('Vehicles API', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.vehicle).toMatchObject({ ...sampleVehicle, price: 19999, color: 'Midnight Blue' });
+    });
+
+    it('can remove a photo by setting it to null', async () => {
+      const created = await createVehicle(ctx, admin, { imageUrl: 'https://example.com/car.jpg' });
+      const res = await request(ctx.app).put(`/api/vehicles/${created.id}`).set(admin).send({ imageUrl: null });
+
+      expect(res.status).toBe(200);
+      expect(res.body.vehicle.imageUrl).toBeNull();
     });
 
     it('returns 400 for an empty update', async () => {
