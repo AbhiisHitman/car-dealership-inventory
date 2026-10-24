@@ -15,6 +15,7 @@
     "preview": "vite preview",
     "start:api": "tsx --env-file-if-exists=.env server/src/index.ts",
     "seed": "tsx --env-file-if-exists=.env server/src/scripts/seed.ts",
+    "catalog:refresh": "tsx --env-file-if-exists=.env server/src/scripts/refreshCatalog.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
