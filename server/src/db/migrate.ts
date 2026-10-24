@@ -28,6 +28,11 @@ CREATE TABLE IF NOT EXISTS vehicles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Added after launch: photo of the vehicle and its attribution (for openly licensed images).
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS image_url TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS image_credit TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS image_source_url TEXT;
+
 CREATE INDEX IF NOT EXISTS vehicles_make_idx ON vehicles (lower(make));
 CREATE INDEX IF NOT EXISTS vehicles_category_idx ON vehicles (lower(category));
 

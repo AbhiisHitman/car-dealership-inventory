@@ -28,6 +28,13 @@ const optionalText = (max: number) =>
 
 const currentYear = new Date().getFullYear();
 
+/** Only http(s) links, so a stored URL can never become a javascript: link in the UI. */
+const optionalWebUrl = z
+  .url({ protocol: /^https?$/, error: 'Must be an http(s) URL' })
+  .max(2000)
+  .nullable()
+  .optional();
+
 export const createVehicleSchema = z.object({
   make: requiredText('Make'),
   model: requiredText('Model'),
@@ -42,7 +49,10 @@ export const createVehicleSchema = z.object({
     .nullable()
     .optional(),
   color: optionalText(40),
-  description: optionalText(1000)
+  description: optionalText(1000),
+  imageUrl: optionalWebUrl,
+  imageCredit: optionalText(200),
+  imageSourceUrl: optionalWebUrl
 });
 
 export const updateVehicleSchema = createVehicleSchema

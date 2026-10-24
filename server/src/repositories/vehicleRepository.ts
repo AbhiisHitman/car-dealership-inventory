@@ -12,6 +12,9 @@ export interface VehicleRow {
   year: number | null;
   color: string | null;
   description: string | null;
+  image_url: string | null;
+  image_credit: string | null;
+  image_source_url: string | null;
   created_at: Date | string;
   updated_at: Date | string;
 }
@@ -26,12 +29,27 @@ export const toVehicle = (row: VehicleRow): Vehicle => ({
   year: row.year,
   color: row.color,
   description: row.description,
+  imageUrl: row.image_url ?? null,
+  imageCredit: row.image_credit ?? null,
+  imageSourceUrl: row.image_source_url ?? null,
   createdAt: new Date(row.created_at).toISOString(),
   updatedAt: new Date(row.updated_at).toISOString()
 });
 
-/** Columns a client may write, mapped to their SQL names. */
-const WRITABLE_COLUMNS = ['make', 'model', 'category', 'price', 'quantity', 'year', 'color', 'description'] as const;
+/** Fields a client may write, mapped to their SQL column names. */
+const WRITABLE: [keyof CreateVehicleInput, string][] = [
+  ['make', 'make'],
+  ['model', 'model'],
+  ['category', 'category'],
+  ['price', 'price'],
+  ['quantity', 'quantity'],
+  ['year', 'year'],
+  ['color', 'color'],
+  ['description', 'description'],
+  ['imageUrl', 'image_url'],
+  ['imageCredit', 'image_credit'],
+  ['imageSourceUrl', 'image_source_url']
+];
 
 /** Escapes LIKE wildcards so user input such as "%" is matched literally. */
 export const escapeLike = (value: string) => value.replace(/[\\%_]/g, match => `\\${match}`);
@@ -61,10 +79,10 @@ export class VehicleRepository {
   constructor(private readonly db: Database) {}
 
   async create(input: CreateVehicleInput): Promise<Vehicle> {
-    const values = WRITABLE_COLUMNS.map(column => input[column] ?? null);
-    const placeholders = WRITABLE_COLUMNS.map((_, i) => `$${i + 1}`).join(', ');
+    const values = WRITABLE.map(([field]) => input[field] ?? null);
+    const placeholders = WRITABLE.map((_, i) => `$${i + 1}`).join(', ');
     const [row] = await this.db.query<VehicleRow>(
-      `INSERT INTO vehicles (${WRITABLE_COLUMNS.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+      `INSERT INTO vehicles (${WRITABLE.map(([, column]) => column).join(', ')}) VALUES (${placeholders}) RETURNING *`,
       values
     );
     return toVehicle(row);
@@ -89,11 +107,20 @@ export class VehicleRepository {
   }
 
   async update(id: string, changes: UpdateVehicleInput): Promise<Vehicle | undefined> {
-    const columns = WRITABLE_COLUMNS.filter(column => changes[column] !== undefined);
-    const assignments = columns.map((column, i) => `${column} = $${i + 2}`);
+    const columns = WRITABLE.filter(([field]) => changes[field] !== undefined);
+    const assignments = columns.map(([, column], i) => `${column} = $${i + 2}`);
     const [row] = await this.db.query<VehicleRow>(
       `UPDATE vehicles SET ${[...assignments, 'updated_at = now()'].join(', ')} WHERE id = $1 RETURNING *`,
-      [id, ...columns.map(column => changes[column])]
+      [id, ...columns.map(([field]) => changes[field])]
+    );
+    return row ? toVehicle(row) : undefined;
+  }
+
+  /** Case-insensitive lookup used to keep the demo catalogue free of duplicates. */
+  async findByMakeModel(make: string, model: string): Promise<Vehicle | undefined> {
+    const [row] = await this.db.query<VehicleRow>(
+      `SELECT * FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2) ORDER BY created_at LIMIT 1`,
+      [make, model]
     );
     return row ? toVehicle(row) : undefined;
   }

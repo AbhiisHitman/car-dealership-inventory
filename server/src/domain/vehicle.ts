@@ -8,6 +8,9 @@ export interface Vehicle {
   year: number | null;
   color: string | null;
   description: string | null;
+  imageUrl: string | null;
+  imageCredit: string | null;
+  imageSourceUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
