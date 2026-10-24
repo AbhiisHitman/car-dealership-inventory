@@ -6,6 +6,7 @@ import type { Container } from './container.js';
 import { authenticate } from './middleware/authenticate.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { authRoutes } from './routes/authRoutes.js';
+import { vehicleRoutes } from './routes/vehicleRoutes.js';
 
 /** Builds the Express application. All dependencies arrive through the container. */
 export function createApp(container: Container, config: AppConfig): Express {
@@ -21,6 +22,7 @@ export function createApp(container: Container, config: AppConfig): Express {
     res.json({ status: 'ok' });
   });
   app.use('/api/auth', authRoutes(container.authService, requireAuth));
+  app.use('/api/vehicles', vehicleRoutes(container.vehicleService, requireAuth));
 
   app.use(notFoundHandler);
   app.use(errorHandler);
